@@ -125,6 +125,10 @@ cp "${FINDER_APP_DIR}/writer" "${OUTDIR}/rootfs/home/"
 cp "${FINDER_APP_DIR}/finder.sh" "${OUTDIR}/rootfs/home/"
 cp "${FINDER_APP_DIR}/finder-test.sh" "${OUTDIR}/rootfs/home/"
 
+# Run QEMU
+cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${OUTDIR}/rootfs/home/"
+
+
 # Copy configuration files
 cp -r "${FINDER_APP_DIR}/conf/"* "${OUTDIR}/rootfs/home/conf/"
 # TODO: Chown the root directory
@@ -133,6 +137,8 @@ cd "${OUTDIR}/rootfs"
 sudo chown -R root:root .
 # TODO: Create initramfs.cpio.gz
 # echo "Creating initramfs.cpio.gz"
+
+chmod +x "${OUTDIR}/rootfs/home/autorun-qemu.sh"
 
 cd "${OUTDIR}/rootfs"
 find . | cpio -H newc -ov --owner root:root > "${OUTDIR}/initramfs.cpio"
