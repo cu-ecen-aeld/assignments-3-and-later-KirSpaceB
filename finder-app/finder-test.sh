@@ -10,13 +10,6 @@ WRITESTR=AELD_IS_FUN
 WRITEDIR=/tmp/aeld-data
 username=$(cat conf/username.txt)
 
-make clean
-make
-if [ $? -ne 0 ]; then
-    echo "ERROR: make failed, cannot build writer"
-    exit 1
-fi
-
 if [ $# -lt 3 ]
 then
 	echo "Using default value ${WRITESTR} for string to write"
