@@ -118,35 +118,29 @@ make CROSS_COMPILE=${CROSS_COMPILE}
 # on the target rootfs
 echo "Copying finder scripts and executables to target rootfs /home"
 
-mkdir -p "${OUTDIR}/rootfs/home/conf"
+HOME_DIR="${OUTDIR}/rootfs/home"
+mkdir -p "${HOME_DIR}/conf"
 
-# Copy the writer binary
-cp "${FINDER_APP_DIR}/writer" "${OUTDIR}/rootfs/home/"
-
-# Copy scripts
-cp "${FINDER_APP_DIR}/finder.sh" "${OUTDIR}/rootfs/home/"
-cp "${FINDER_APP_DIR}/finder-test.sh" "${OUTDIR}/rootfs/home/"
-
-# Run QEMU
-cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${OUTDIR}/rootfs/home/"
-
+# Copy binaries and scripts into /home in the rootfs
+cp "${FINDER_APP_DIR}/writer"         "${HOME_DIR}/"
+cp "${FINDER_APP_DIR}/finder.sh"      "${HOME_DIR}/"
+cp "${FINDER_APP_DIR}/finder-test.sh" "${HOME_DIR}/"
+cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${HOME_DIR}/"
 
 # Copy configuration files
-cp -r "${FINDER_APP_DIR}/conf/"* "${OUTDIR}/rootfs/home/conf/"
+cp -r "${FINDER_APP_DIR}/conf/"*      "${HOME_DIR}/conf/"
 
-chmod +x "${OUTDIR}/rootfs/home/autorun-qemu.sh"
-chmod +x "${OUTDIR}/rootfs/home/finder.sh"
-chmod +x "${OUTDIR}/rootfs/home/finder-test.sh"
-chmod +x "${OUTDIR}/rootfs/home/writer"
+# Make sure everything in /home is executable where needed
+chmod +x "${HOME_DIR}/writer"
+chmod +x "${HOME_DIR}/finder.sh"
+chmod +x "${HOME_DIR}/finder-test.sh"
+chmod +x "${HOME_DIR}/autorun-qemu.sh"
 
-# TODO: Chown the root directory
 echo "Setting ownership of rootfs to root:root"
 cd "${OUTDIR}/rootfs"
 sudo chown -R root:root .
 
-# TODO: Create initramfs.cpio.gz
 echo "Creating initramfs.cpio.gz"
-
 find . | cpio -H newc -ov --owner root:root > "${OUTDIR}/initramfs.cpio"
 
 cd "${OUTDIR}"
