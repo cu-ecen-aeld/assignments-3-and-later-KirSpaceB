@@ -106,10 +106,12 @@ cp -a "${SYSROOT}/lib64/libc.so.6"       "${OUTDIR}/rootfs/lib64/"
 echo "Creating device nodes"
 sudo mknod -m 666 "${OUTDIR}/rootfs/dev/null" c 1 3
 sudo mknod -m 600 "${OUTDIR}/rootfs/dev/console" c 5 1
+
 # TODO: Clean and build the writer utility
 echo "Cleaning and building writer utility"
 
 cd "${FINDER_APP_DIR}"
+make clean
 make CROSS_COMPILE=${CROSS_COMPILE}
 
 # TODO: Copy the finder related scripts and executables to the /home directory
@@ -131,16 +133,17 @@ cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${OUTDIR}/rootfs/home/"
 
 # Copy configuration files
 cp -r "${FINDER_APP_DIR}/conf/"* "${OUTDIR}/rootfs/home/conf/"
+
+chmod +x "${OUTDIR}/rootfs/home/autorun-qemu.sh"
+
 # TODO: Chown the root directory
 echo "Setting ownership of rootfs to root:root"
 cd "${OUTDIR}/rootfs"
 sudo chown -R root:root .
+
 # TODO: Create initramfs.cpio.gz
-# echo "Creating initramfs.cpio.gz"
+echo "Creating initramfs.cpio.gz"
 
-chmod +x "${OUTDIR}/rootfs/home/autorun-qemu.sh"
-
-cd "${OUTDIR}/rootfs"
 find . | cpio -H newc -ov --owner root:root > "${OUTDIR}/initramfs.cpio"
 
 cd "${OUTDIR}"
