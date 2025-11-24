@@ -135,6 +135,9 @@ cp "${FINDER_APP_DIR}/autorun-qemu.sh" "${OUTDIR}/rootfs/home/"
 cp -r "${FINDER_APP_DIR}/conf/"* "${OUTDIR}/rootfs/home/conf/"
 
 chmod +x "${OUTDIR}/rootfs/home/autorun-qemu.sh"
+chmod +x "${OUTDIR}/rootfs/home/finder.sh"
+chmod +x "${OUTDIR}/rootfs/home/finder-test.sh"
+chmod +x "${OUTDIR}/rootfs/home/writer"
 
 # TODO: Chown the root directory
 echo "Setting ownership of rootfs to root:root"
