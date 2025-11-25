@@ -1,24 +1,21 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 
 if [ $# -ne 2 ]; then
-  echo "Usage: $0 <filesdir> <searchstr>"
-  exit 1
+    echo "Usage: $0 <filesdir> <searchstr>" >&2
+    exit 1
 fi
 
 filesdir=$1
 searchstr=$2
 
-# Validation
 if [ ! -d "$filesdir" ]; then
-  echo "Error: $filesdir is not a directory"
-  exit 1
+    echo "Error: $filesdir is not a directory" >&2
+    exit 1
 fi
 
-# Stuff
-X=$(find "$filesdir" -type f | wc -l)
+num_files=$(grep -rl "$searchstr" "$filesdir" | wc -l)
+num_lines=$(grep -r  "$searchstr" "$filesdir" | wc -l)
 
-# Y = number of matching lines (recursively, fixed-string, skip binaries)
-Y=$(grep -R --binary-files=without-match -F "$searchstr" "$filesdir" | wc -l)
+echo "The number of files are ${num_files} and the number of matching lines are ${num_lines}"
 
-echo "The number of files are $X and the number of matching lines are $Y"
