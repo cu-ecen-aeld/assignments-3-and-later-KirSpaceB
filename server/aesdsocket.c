@@ -3,15 +3,18 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <pthread.h>
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <syslog.h>
+#include <time.h>
 #include <unistd.h>
 
 #define PORT 9000
@@ -21,6 +24,18 @@
 
 static volatile sig_atomic_t g_exit_requested = 0;
 static int g_server_fd = -1;
+// Added code
+static pthread_mutex_t g_file_mutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_t g_timestamp_thread;
+struct thread_node {
+  pthread_t thread_id;
+  int client_fd;
+  bool thread_complete;
+  SLIST_ENTRY(thread_node) entries;
+};
+
+SLIST_HEAD(thread_list, thread_node);
+static struct thread_list g_threads = SLIST_HEAD_INITIALIZER(g_threads);
 
 static void handle_signal(int signo) {
   (void)signo;
@@ -49,6 +64,7 @@ static int send_all(int fd, const void *buf, size_t len) {
 }
 
 static int daemonize(void) {
+
   pid_t pid = fork();
   if (pid < 0)
     return -1;
@@ -79,6 +95,162 @@ static int daemonize(void) {
     close(fd);
 
   return 0;
+}
+
+static void *timestamp_thread_func(void *arg) {
+  (void)arg;
+
+  while (!g_exit_requested) {
+    sleep(10);
+    if (g_exit_requested)
+      break;
+
+    time_t now = time(NULL);
+    struct tm tm_now;
+    localtime_r(&now, &tm_now);
+
+    char timestr[128];
+    // RFC2822-ish time format
+    if (strftime(timestr, sizeof(timestr), "%a, %d %b %Y %H:%M:%S %z",
+                 &tm_now) == 0) {
+      continue;
+    }
+
+    char line[256];
+    int n = snprintf(line, sizeof(line), "timestamp:%s\n", timestr);
+    if (n <= 0)
+      continue;
+
+    pthread_mutex_lock(&g_file_mutex);
+    int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
+    if (fd >= 0) {
+      (void)write(fd, line, (size_t)n);
+      close(fd);
+    }
+    pthread_mutex_unlock(&g_file_mutex);
+  }
+  return NULL;
+}
+
+static void *client_thread_func(void *arg) {
+  struct thread_node *node = (struct thread_node *)arg;
+  int client_fd = node->client_fd;
+
+  char recvbuf[RECV_CHUNK];
+  char *line = NULL;
+  size_t line_cap = 0;
+  size_t line_len = 0;
+
+  while (!g_exit_requested) {
+    ssize_t n = recv(client_fd, recvbuf, sizeof(recvbuf), 0);
+    if (n < 0) {
+      if (errno == EINTR)
+        continue;
+      syslog(LOG_ERR, "recv failed: %s", strerror(errno));
+      break;
+    }
+    if (n == 0) {
+      // client closed
+      break;
+    }
+
+    // grow buffer
+    if (line_len + (size_t)n + 1 > line_cap) {
+      size_t newcap = (line_cap == 0) ? 2048 : line_cap;
+      while (newcap < line_len + (size_t)n + 1)
+        newcap *= 2;
+      char *tmp = realloc(line, newcap);
+      if (!tmp) {
+        syslog(LOG_ERR, "realloc failed");
+        break;
+      }
+      line = tmp;
+      line_cap = newcap;
+    }
+
+    memcpy(line + line_len, recvbuf, (size_t)n);
+    line_len += (size_t)n;
+    line[line_len] = '\0';
+
+    // process each newline-terminated record
+    char *start = line;
+    char *nl;
+    while ((nl = memchr(start, '\n', (line + line_len) - start)) != NULL) {
+      size_t record_len = (size_t)(nl - start) + 1;
+
+      // ---- CRITICAL SECTION (mutex) ----
+      pthread_mutex_lock(&g_file_mutex);
+
+      // append record
+      int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
+      if (fd >= 0) {
+        (void)write(fd, start, record_len);
+        close(fd);
+      }
+
+      // send entire file back
+      fd = open(DATAFILE, O_RDONLY);
+      if (fd >= 0) {
+        char filebuf[RECV_CHUNK];
+        for (;;) {
+          ssize_t r = read(fd, filebuf, sizeof(filebuf));
+          if (r < 0) {
+            if (errno == EINTR)
+              continue;
+            break;
+          }
+          if (r == 0)
+            break;
+          if (send_all(client_fd, filebuf, (size_t)r) != 0)
+            break;
+        }
+        close(fd);
+      }
+
+      pthread_mutex_unlock(&g_file_mutex);
+      // ---- END CRITICAL SECTION ----
+
+      start = nl + 1;
+    }
+
+    // keep leftover partial data (after last newline) in buffer
+    size_t remaining = (size_t)((line + line_len) - start);
+    memmove(line, start, remaining);
+    line_len = remaining;
+    line[line_len] = '\0';
+  }
+
+  free(line);
+  shutdown(client_fd, SHUT_RDWR);
+  close(client_fd);
+
+  node->thread_complete = true;
+  return NULL;
+}
+
+static void reap_completed_threads(void) {
+  struct thread_node *prev = NULL;
+  struct thread_node *cur = SLIST_FIRST(&g_threads);
+
+  while (cur) {
+    struct thread_node *next = SLIST_NEXT(cur, entries);
+
+    if (cur->thread_complete) {
+      pthread_join(cur->thread_id, NULL);
+
+      if (prev == NULL) {
+        SLIST_REMOVE_HEAD(&g_threads, entries);
+      } else {
+        SLIST_REMOVE_AFTER(prev, entries);
+      }
+      free(cur);
+      cur = next;
+      continue;
+    }
+
+    prev = cur;
+    cur = next;
+  }
 }
 
 int main(int argc, char *argv[]) {
@@ -114,6 +286,13 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // added code
+  if (pthread_create(&g_timestamp_thread, NULL, timestamp_thread_func, NULL) !=
+      0) {
+    syslog(LOG_ERR, "pthread_create(timestamp) failed: %s", strerror(errno));
+    closelog();
+    return 1;
+  }
   // 1) socket()
   g_server_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (g_server_fd < 0) {
@@ -158,7 +337,7 @@ int main(int argc, char *argv[]) {
   }
 
   while (!g_exit_requested) {
-    // 5) accept()
+    // accept() // I uncommented this accept function
     struct sockaddr_in client_addr;
     socklen_t client_len = sizeof(client_addr);
     int client_fd =
@@ -174,90 +353,30 @@ int main(int argc, char *argv[]) {
     inet_ntop(AF_INET, &client_addr.sin_addr, ip, sizeof(ip));
     syslog(LOG_INFO, "Accepted connection from %s", ip);
 
-    // Receive until newline
-    char recvbuf[RECV_CHUNK];
-    char *line = NULL;
-    size_t line_cap = 0;
-    size_t line_len = 0;
-
-    bool got_newline = false;
-    while (!got_newline) {
-      ssize_t n = recv(client_fd, recvbuf, sizeof(recvbuf), 0);
-      if (n < 0) {
-        if (errno == EINTR)
-          continue;
-        syslog(LOG_ERR, "recv failed: %s", strerror(errno));
-        break;
-      }
-      if (n == 0) {
-        // client closed
-        break;
-      }
-
-      // grow line buffer
-      if (line_len + (size_t)n + 1 > line_cap) {
-        size_t newcap = (line_cap == 0) ? 2048 : line_cap;
-        while (newcap < line_len + (size_t)n + 1)
-          newcap *= 2;
-        char *tmp = realloc(line, newcap);
-        if (!tmp) {
-          syslog(LOG_ERR, "realloc failed");
-          break;
-        }
-        line = tmp;
-        line_cap = newcap;
-      }
-
-      memcpy(line + line_len, recvbuf, (size_t)n);
-      line_len += (size_t)n;
-      line[line_len] = '\0';
-
-      if (memchr(recvbuf, '\n', (size_t)n) != NULL) {
-        got_newline = true;
-      }
+    // Allocate thread node
+    struct thread_node *node = calloc(1, sizeof(*node));
+    if (!node) {
+      syslog(LOG_ERR, "calloc failed");
+      close(client_fd);
+      continue;
     }
 
-    if (line && line_len > 0 && got_newline) {
-      // Append received line to file
-      int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
-      if (fd < 0) {
-        syslog(LOG_ERR, "open datafile failed: %s", strerror(errno));
-      } else {
-        ssize_t w = write(fd, line, line_len);
-        if (w < 0) {
-          syslog(LOG_ERR, "write failed: %s", strerror(errno));
-        }
-        close(fd);
+    node->client_fd = client_fd;
+    node->thread_complete = false;
 
-        // Send back the entire file
-        fd = open(DATAFILE, O_RDONLY);
-        if (fd < 0) {
-          syslog(LOG_ERR, "open datafile for read failed: %s", strerror(errno));
-        } else {
-          char filebuf[RECV_CHUNK];
-          for (;;) {
-            ssize_t r = read(fd, filebuf, sizeof(filebuf));
-            if (r < 0) {
-              if (errno == EINTR)
-                continue;
-              syslog(LOG_ERR, "read failed: %s", strerror(errno));
-              break;
-            }
-            if (r == 0)
-              break; // EOF
-            if (send_all(client_fd, filebuf, (size_t)r) != 0) {
-              syslog(LOG_ERR, "send failed: %s", strerror(errno));
-              break;
-            }
-          }
-          close(fd);
-        }
-      }
+    // Spawn thread
+    if (pthread_create(&node->thread_id, NULL, client_thread_func, node) != 0) {
+      syslog(LOG_ERR, "pthread_create(client) failed: %s", strerror(errno));
+      close(client_fd);
+      free(node);
+      continue;
     }
 
-    free(line);
-    close(client_fd);
-    syslog(LOG_INFO, "Closed connection from %s", ip);
+    // Add to singly linked list
+    SLIST_INSERT_HEAD(&g_threads, node, entries);
+
+    // Join any completed threads
+    reap_completed_threads();
   }
 
   // Cleanup
@@ -265,7 +384,29 @@ int main(int argc, char *argv[]) {
     close(g_server_fd);
     g_server_fd = -1;
   }
+  g_exit_requested = 1;
+  struct thread_node *cur;
+  SLIST_FOREACH(cur, &g_threads, entries) {
+    if (cur->client_fd != -1) {
+      shutdown(cur->client_fd, SHUT_RDWR);
+    }
+  }
+  while (!SLIST_EMPTY(&g_threads)) {
+    cur = SLIST_FIRST(&g_threads);
+    pthread_join(cur->thread_id, NULL);
+    SLIST_REMOVE_HEAD(&g_threads, entries);
+    // client_thread_func closes client_fd, but closing again is safe if already
+    // closed. If you prefer, you can omit the close here.
+    if (cur->client_fd != -1) {
+      close(cur->client_fd);
+      cur->client_fd = -1;
+    }
+    free(cur);
+  }
+  pthread_join(g_timestamp_thread, NULL);
+  pthread_mutex_destroy(&g_file_mutex);
   unlink(DATAFILE);
+
   syslog(LOG_INFO, "Exiting");
   closelog();
   return 0;
