@@ -40,12 +40,6 @@ static struct thread_list g_threads = SLIST_HEAD_INITIALIZER(g_threads);
 static void handle_signal(int signo) {
   (void)signo;
   g_exit_requested = 1;
-  // If blocked in accept(), closing server fd helps break out on some systems.
-  if (g_server_fd != -1) {
-    shutdown(g_server_fd, SHUT_RDWR);
-    close(g_server_fd);
-    g_server_fd = -1;
-  }
 }
 
 static int send_all(int fd, const void *buf, size_t len) {
@@ -124,7 +118,19 @@ static void *timestamp_thread_func(void *arg) {
     pthread_mutex_lock(&g_file_mutex);
     int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
     if (fd >= 0) {
-      (void)write(fd, line, (size_t)n);
+      size_t off = 0;
+      size_t len = (size_t)n;
+      while (off < len) {
+        ssize_t w = write(fd, line + off, len - off);
+        if (w < 0) {
+          if (errno == EINTR)
+            continue;
+          syslog(LOG_ERR, "write failed: %s", strerror(errno));
+          break;
+        }
+        off += (size_t)w;
+      }
+
       close(fd);
     }
     pthread_mutex_unlock(&g_file_mutex);
@@ -149,8 +155,54 @@ static void *client_thread_func(void *arg) {
       syslog(LOG_ERR, "recv failed: %s", strerror(errno));
       break;
     }
+
     if (n == 0) {
-      // client closed
+      // Client closed. If we have leftover data not ending in '\n',
+      // treat it as a complete record (sockettest expects this).
+      if (line_len > 0) {
+        pthread_mutex_lock(&g_file_mutex);
+
+        // Append leftover data (no newline added)
+        int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (fd >= 0) {
+          size_t off = 0;
+          while (off < line_len) {
+            ssize_t w = write(fd, line + off, line_len - off);
+            if (w < 0) {
+              if (errno == EINTR)
+                continue;
+              syslog(LOG_ERR, "write failed: %s", strerror(errno));
+              break;
+            }
+            off += (size_t)w;
+          }
+          close(fd);
+        } else {
+          syslog(LOG_ERR, "open(DATAFILE) for append failed: %s",
+                 strerror(errno));
+        }
+
+        // Send entire file back
+        fd = open(DATAFILE, O_RDONLY);
+        if (fd >= 0) {
+          char filebuf[RECV_CHUNK];
+          for (;;) {
+            ssize_t r = read(fd, filebuf, sizeof(filebuf));
+            if (r < 0) {
+              if (errno == EINTR)
+                continue;
+              break;
+            }
+            if (r == 0)
+              break;
+            if (send_all(client_fd, filebuf, (size_t)r) != 0)
+              break;
+          }
+          close(fd);
+        }
+
+        pthread_mutex_unlock(&g_file_mutex);
+      }
       break;
     }
 
@@ -184,8 +236,21 @@ static void *client_thread_func(void *arg) {
       // append record
       int fd = open(DATAFILE, O_WRONLY | O_CREAT | O_APPEND, 0644);
       if (fd >= 0) {
-        (void)write(fd, start, record_len);
+        size_t off = 0;
+        while (off < record_len) {
+          ssize_t w = write(fd, start + off, record_len - off);
+          if (w < 0) {
+            if (errno == EINTR)
+              continue;
+            syslog(LOG_ERR, "write failed: %s", strerror(errno));
+            break;
+          }
+          off += (size_t)w;
+        }
         close(fd);
+      } else {
+        syslog(LOG_ERR, "open(DATAFILE) for append failed: %s",
+               strerror(errno));
       }
 
       // send entire file back
@@ -229,27 +294,19 @@ static void *client_thread_func(void *arg) {
 }
 
 static void reap_completed_threads(void) {
-  struct thread_node *prev = NULL;
   struct thread_node *cur = SLIST_FIRST(&g_threads);
+  struct thread_node *tmp;
 
   while (cur) {
-    struct thread_node *next = SLIST_NEXT(cur, entries);
+    tmp = SLIST_NEXT(cur, entries);
 
     if (cur->thread_complete) {
       pthread_join(cur->thread_id, NULL);
-
-      if (prev == NULL) {
-        SLIST_REMOVE_HEAD(&g_threads, entries);
-      } else {
-        SLIST_REMOVE_AFTER(prev, entries);
-      }
+      SLIST_REMOVE(&g_threads, cur, thread_node, entries);
       free(cur);
-      cur = next;
-      continue;
     }
 
-    prev = cur;
-    cur = next;
+    cur = tmp;
   }
 }
 

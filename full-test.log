@@ -1,0 +1,228 @@
++ set -e
+++ dirname ./full-test.sh
++ cd .
+++ pwd
++ test_dir=/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
++ echo 'starting test with SKIP_BUILD="" and DO_VALIDATE=""'
+starting test with SKIP_BUILD="" and DO_VALIDATE=""
++ logfile=test.sh.log
++ exec
+++ tee -i -a test.sh.log
+++ tee -i -a test.sh.log
+++ whoami
++ echo 'Running test with user kirbyubuntu'
++ set +e
++ ./unit-test.sh
+Running test with user kirbyubuntu
+CMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at assignment-autotest/CMakeLists.txt:13 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at assignment-autotest/Unity/CMakeLists.txt:11 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at assignment-autotest/Unity/src/CMakeLists.txt:11 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- Generating ;/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c from test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c
+-- Building executable including ;/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_hello_Runner.c;/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c test/assignment1/Test_hello.c;test/assignment1/Test_assignment_validate.c and ../examples/autotest-validate/autotest-validate.c
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/build
+[ 10%] Building C object assignment-autotest/Unity/src/CMakeFiles/unity.dir/unity.c.o
+[ 20%] Linking C static library libunity.a
+[ 20%] Built target unity
+[ 30%] Generating /home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_hello_Runner.c, /home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_assignment_validate_Runner.c, /home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/unity_runner.c
+Test files for auto dependency generation test/assignment1/Test_hello.c test/assignment1/Test_assignment_validate.c
+Autogenerating runner for test/assignment1/Test_hello.c
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/Unity/auto/generate_test_runner.rb:344: warning: Passing safe_level with the 2nd argument of ERB.new is deprecated. Do not use it, and specify other arguments as keyword arguments.
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/Unity/auto/generate_test_runner.rb:344: warning: Passing trim_mode with the 3rd argument of ERB.new is deprecated. Use keyword argument like ERB.new(str, trim_mode: ...) instead.
+Autogenerating runner for test/assignment1/Test_assignment_validate.c
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/Unity/auto/generate_test_runner.rb:344: warning: Passing safe_level with the 2nd argument of ERB.new is deprecated. Do not use it, and specify other arguments as keyword arguments.
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/Unity/auto/generate_test_runner.rb:344: warning: Passing trim_mode with the 3rd argument of ERB.new is deprecated. Use keyword argument like ERB.new(str, trim_mode: ...) instead.
+Autogenerating test/unity_runner.c
+[ 40%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello.c.o
+[ 50%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate.c.o
+[ 60%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_hello_Runner.c.o
+[ 70%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/assignment1/Test_assignment_validate_Runner.c.o
+[ 80%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/__/examples/autotest-validate/autotest-validate.c.o
+[ 90%] Building C object assignment-autotest/CMakeFiles/assignment-autotest.dir/test/unity_runner.c.o
+[100%] Linking C executable assignment-autotest
+[100%] Built target assignment-autotest
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_hello.c:6:test_hello:INFO: Hello!  Your unity setup is working!
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_hello.c:4:test_hello:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
+/home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment1/Test_assignment_validate.c:9:test_assignment_validate:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK
++ unit_test_rc=0
++ '[' 0 -ne 0 ']'
++ '[' -f conf/assignment.txt ']'
+++ cat conf/assignment.txt
+Executing assignment test script
++ assignment=assignment6
++ '[' -f ./assignment-autotest/test/assignment6/assignment-test.sh ']'
++ echo 'Executing assignment test script'
++ ./assignment-autotest/test/assignment6/assignment-test.sh /home/kirbyubuntu/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/server ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+rm -f aesdsocket aesdsocket.o
+gcc -Wall -Wextra -O2 -c aesdsocket.c -o aesdsocket.o
+gcc -Wall -Wextra -O2 -o aesdsocket aesdsocket.o 
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/server ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+Testing target localhost on port 9000
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string abcdefg
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string hijklmnop
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string 1234567890
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string 9876543210
+
+Spawning three processes to ensure multithreaded writes work as expected
+Process 1 writes One best book is equal to a hundred good friends, but one good friend is equal to a library
+Process 2 writes If you want to shine like a sun, first burn like a sun
+Process 3 writes Never stop fighting until you arrive at your destined place - that is, the unique you
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 1
+Waiting for sends to compete on all processes
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 1
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 2
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 3
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 3
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 3
+Process 2 complete
+Process 3 complete
+Process 1 complete
+WARNING: tempfile is deprecated; consider using mktemp instead.
+multithreaded test complete with success
+
+Testing the timer functionality
+WARNING: tempfile is deprecated; consider using mktemp instead.
+No of timestamps currently in server file: 0
+No of timestamps expected after a delay of 21 seconds is 2
+No of timestamps found in file: 3
+Congrats! Tests completed with success
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/server ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+Waiting for aesdsocket application with pid 99975 to terminate
+Re-running sockettest.sh with valgrind
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/server ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/server ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB/assignment-autotest/test/assignment6 ~/Documents/School_Work/Linux_Kernel_Programming_Yocto/assignments-3-and-later-KirSpaceB
+Starting valgrind
+Waiting for aesdsocket application to start
+timestamp:wait-for-startup
+Testing target localhost on port 9000
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string abcdefg
+Differences found after sending abcdefg to localhost on port 9000
+Expected contents to match:
+abcdefg
+But found contents:
+abcdefg
+hijklmnop
+1234567890
+9876543210
+One best book is equal to a hundred good friends, but one good friend is equal to a library
+If you want to shine like a sun, first burn like a sun
+Never stop fighting until you arrive at your destined place - that is, the unique you
+If you want to shine like a sun, first burn like a sun
+One best book is equal to a hundred good friends, but one good friend is equal to a library
+Never stop fighting until you arrive at your destined place - that is, the unique you
+If you want to shine like a sun, first burn like a sun
+One best book is equal to a hundred good friends, but one good friend is equal to a library
+Never stop fighting until you arrive at your destined place - that is, the unique you
+validate_multithreaded
+test_socket_timer
+timestamp:Sun, 22 Feb 2026 11:27:35 -0800
+timestamp:Sun, 22 Feb 2026 11:27:45 -0800
+timestamp:Sun, 22 Feb 2026 11:27:55 -0800
+test_socket_timer
+timestamp:wait-for-startup
+abcdefg
+With differences
+--- /tmp/fileVVgvwY	2026-02-22 11:28:00.899603075 -0800
++++ /tmp/fileR916d9	2026-02-22 11:27:59.892601898 -0800
+@@ -1 +1,21 @@
+ abcdefg
++hijklmnop
++1234567890
++9876543210
++One best book is equal to a hundred good friends, but one good friend is equal to a library
++If you want to shine like a sun, first burn like a sun
++Never stop fighting until you arrive at your destined place - that is, the unique you
++If you want to shine like a sun, first burn like a sun
++One best book is equal to a hundred good friends, but one good friend is equal to a library
++Never stop fighting until you arrive at your destined place - that is, the unique you
++If you want to shine like a sun, first burn like a sun
++One best book is equal to a hundred good friends, but one good friend is equal to a library
++Never stop fighting until you arrive at your destined place - that is, the unique you
++validate_multithreaded
++test_socket_timer
++timestamp:Sun, 22 Feb 2026 11:27:35 -0800
++timestamp:Sun, 22 Feb 2026 11:27:45 -0800
++timestamp:Sun, 22 Feb 2026 11:27:55 -0800
++test_socket_timer
++timestamp:wait-for-startup
++abcdefg
+Test complete with failure. Make sure you have restarted the socket server before starting this script
+[0;31mValidation Error:sockettest.sh returned 1 attempting to run against native compiled aesdsocket instance running under valgrind[0m
+Stopping valgrind and aesdsocket process at pid 100182
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Waiting for aesdsocket and valgrind to exit
+Valgrind and aesdsocket complete
+deleting marker file /tmp/tmp.TzUUwx44Ck
+Validation failed with error list :sockettest.sh returned 1 attempting to run against native compiled aesdsocket instance running under valgrind
++ rc=1
++ '[' 1 -eq 0 ']'
++ echo 'Test of assignment assignment6 failed with rc=1'
++ exit 1
+Test of assignment assignment6 failed with rc=1

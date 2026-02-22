@@ -1,0 +1,45 @@
+Testing target localhost on port 9000
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string abcdefg
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string hijklmnop
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string 1234567890
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+WARNING: tempfile is deprecated; consider using mktemp instead.
+sending string 9876543210
+
+Spawning three processes to ensure multithreaded writes work as expected
+Process 1 writes One best book is equal to a hundred good friends, but one good friend is equal to a library
+Process 2 writes If you want to shine like a sun, first burn like a sun
+Process 3 writes Never stop fighting until you arrive at your destined place - that is, the unique you
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 1
+Waiting for sends to compete on all processes
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 1
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 1
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 2
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 2
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 2
+Sending string One best book is equal to a hundred good friends, but one good friend is equal to a library from process 1: instance 3
+Sending string Never stop fighting until you arrive at your destined place - that is, the unique you from process 3: instance 3
+Sending string If you want to shine like a sun, first burn like a sun from process 2: instance 3
+Process 1 complete
+Process 3 complete
+Process 2 complete
+WARNING: tempfile is deprecated; consider using mktemp instead.
+multithreaded test complete with success
+
+Testing the timer functionality
+WARNING: tempfile is deprecated; consider using mktemp instead.
+No of timestamps currently in server file: 0
+No of timestamps expected after a delay of 21 seconds is 2
+No of timestamps found in file: 3
+Congrats! Tests completed with success
