@@ -98,7 +98,8 @@ static void *timestamp_thread_func(void *arg) {
     for (int i = 0; i < 10 && !g_exit_requested; i++) {
       sleep(1);
     }
-    if (g_exit_requested) break;
+    if (g_exit_requested)
+      break;
 
     time_t now = time(NULL);
     struct tm tm_now;
