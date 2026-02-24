@@ -7,6 +7,7 @@ set -e
 cd `dirname $0`
 test_dir=`pwd`
 export PATH="$test_dir/ci-tools:$PATH"
+hash -r
 echo "starting test with SKIP_BUILD=\"${SKIP_BUILD}\" and DO_VALIDATE=\"${DO_VALIDATE}\""
 
 
