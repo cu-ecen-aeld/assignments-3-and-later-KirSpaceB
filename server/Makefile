@@ -6,7 +6,7 @@ CROSS_COMPILE ?=
 CC := $(CROSS_COMPILE)gcc
 
 CFLAGS ?= -Wall -Wextra -O2
-LDFLAGS ?=
+LDFLAGS ?= -pthread -lrt
 
 all: $(TARGET)
 
