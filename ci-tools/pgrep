@@ -1,0 +1,11 @@
+#!/bin/sh
+# Minimal pgrep replacement (supports: pgrep PATTERN and pgrep -f PATTERN)
+
+if [ "$1" = "-f" ]; then
+  shift
+  pat="$1"
+  ps -eo pid,args | grep -F "$pat" | grep -v grep | awk '{print $1}'
+else
+  pat="$1"
+  ps -eo pid,comm | awk -v p="$pat" '$2==p {print $1}'
+fi
