@@ -10,20 +10,22 @@
 
 DAEMON=/usr/bin/aesdsocket
 NAME=aesdsocket
+PIDFILE=/var/run/${NAME}.pid
 
 case "$1" in
   start)
     echo "Starting $NAME"
-    $DAEMON -d
+    start-stop-daemon --start --background --make-pidfile \
+      --pidfile "$PIDFILE" --exec "$DAEMON" -- -d
     ;;
   stop)
     echo "Stopping $NAME"
-    # BusyBox-friendly stop
-    killall aesdsocket 2>/dev/null || true
+    start-stop-daemon --stop --pidfile "$PIDFILE" --retry=TERM/5/KILL/5 || true
+    rm -f "$PIDFILE"
     ;;
   restart)
-    $0 stop
-    $0 start
+    "$0" stop
+    "$0" start
     ;;
   *)
     echo "Usage: $0 {start|stop|restart}"
