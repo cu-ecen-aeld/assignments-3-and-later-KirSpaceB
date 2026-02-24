@@ -12,17 +12,7 @@ source poky/oe-init-build-env
 CONFLINE="MACHINE = \"qemuarm64\""
 
 PROCPS_LINE='IMAGE_INSTALL:append = " procps sysvinit-pidof"'
-NONETLINE='BB_NO_NETWORK = "1"'
 
-cat conf/local.conf | grep "${NONETLINE}" > /dev/null
-nonet_info=$?
-
-if [ $nonet_info -ne 0 ]; then
-    echo "Append ${NONETLINE} in the local.conf file"
-    echo ${NONETLINE} >> conf/local.conf
-else
-    echo "${NONETLINE} already exists in the local.conf file"
-fi
 cat conf/local.conf | grep "${PROCPS_LINE}" > /dev/null
 procps_info=$?
 
