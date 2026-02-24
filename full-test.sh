@@ -9,6 +9,7 @@ test_dir=`pwd`
 export PATH="$test_dir/ci-tools:$PATH"
 echo "starting test with SKIP_BUILD=\"${SKIP_BUILD}\" and DO_VALIDATE=\"${DO_VALIDATE}\""
 
+
 # This part of the script always runs as the current user, even when
 # executed inside a docker container.
 # See the logic in parse_docker_options for implementation
@@ -16,7 +17,10 @@ logfile=test.sh.log
 # See https://stackoverflow.com/a/3403786
 # Place stdout and stderr in a log file
 exec > >(tee -i -a "$logfile") 2> >(tee -i -a "$logfile" >&2)
-
+# DEBUG (add right here)
+echo "PATH=$PATH"
+echo -n "pgrep location: "; which pgrep || echo "MISSING"
+echo "pgrep test (looking for bash): $(pgrep bash | head -n 3)"
 echo "Running test with user $(whoami)"
 
 set +e
