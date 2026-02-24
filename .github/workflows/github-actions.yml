@@ -17,7 +17,7 @@ jobs:
             with:
                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           - name: Run build
-            timeout-minutes: 600
+            timeout-minutes: 60
             run: |
                docker run --rm \
                  -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent \
