@@ -34,7 +34,8 @@ jobs:
             timeout-minutes: 15
             run: |
                docker run --rm \
+                 --user root \
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
                  --workdir=${GITHUB_WORKSPACE} \
                  cuaesd/aesd-autotest:assignment6-yocto \
-                 bash -c "sudo apt-get update && sudo apt-get install -y valgrind && ./full-test.sh"
+                 bash -c "apt-get update && apt-get install -y valgrind && su -s /bin/bash pokyuser -c ./full-test.sh"
