@@ -36,6 +36,9 @@ jobs:
                docker run --rm \
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
                  -v /usr/bin/valgrind:/usr/bin/valgrind \
+                 -v /usr/bin/valgrind.bin:/usr/bin/valgrind.bin \
+                 -v /usr/bin/valgrind-di-server:/usr/bin/valgrind-di-server \
+                 -v /usr/bin/valgrind-listener:/usr/bin/valgrind-listener \
                  -v /usr/lib/valgrind:/usr/lib/valgrind \
                  -v /usr/libexec/valgrind:/usr/libexec/valgrind \
                  --workdir=${GITHUB_WORKSPACE} \
