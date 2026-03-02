@@ -38,4 +38,4 @@ jobs:
                  -v ${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE} \
                  --workdir=${GITHUB_WORKSPACE} \
                  cuaesd/aesd-autotest:assignment6-yocto \
-                 -c "apt-get update && apt-get install -y valgrind procps net-tools 2>&1 | tail -1 && which valgrind && valgrind --version && ./full-test.sh"
+                 -c "apt-get update && apt-get install -y valgrind procps 2>&1 | tail -1 && cp /usr/bin/pgrep ${GITHUB_WORKSPACE}/ci-tools/pgrep && ./full-test.sh"
