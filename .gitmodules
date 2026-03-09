@@ -3,5 +3,5 @@
 	url = https://github.com/cu-ecen-aeld/assignment-autotest.git
 [submodule "poky"]
 	path = poky
-	url = https://git.yoctoproject.org/poky
+	url = https://github.com/yoctoproject/poky.git
 	branch = kirkstone
